@@ -8,7 +8,10 @@ namespace Sudoku
 {
     class Grille
     {
-        public static readonly int NB_CASE_PAR_LIGNE = 9;
+        public static readonly int NB_CASE_PAR_LIGNE = 9; //9 : taille normale, 3 : test
+        public static readonly int NB_CASE_PAR_REGION = 3;
+        public static readonly List<int> POSSIBILITE = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
         private Case[,] cases;
 
         public Grille()
@@ -23,35 +26,85 @@ namespace Sudoku
             {
                 for (int j = 0; j < NB_CASE_PAR_LIGNE; j++)
                 {
-                    cases[j, i] = new Case();
+                    cases[i, j] = new Case(i, j, new Variable("X" + i.ToString() + j.ToString()));
                 }
+            }
+        }
+
+        public void MAJCases()
+        {
+            foreach(Case c in this.cases)
+            {
+                c.SetChiffre(c.GetVariable().GetValeur());
             }
         }
 
         public void Affiche()
         {
-            for(int i = 0; i < NB_CASE_PAR_LIGNE; i++)
+            MAJCases();
+
+            for (int i = 0; i < NB_CASE_PAR_LIGNE; i++)
             {
                 String line = "";
-                for(int j = 0; j < NB_CASE_PAR_LIGNE; j++)
+                if (i%3 == 0 && i != 0)
+                {
+                    line += "\n";
+                }
+                for (int j = 0; j < NB_CASE_PAR_LIGNE; j++)
                 {
                     if(j%3 == 0 && j != 0)
                     {
                         line += " ";
                     }
-                    line += "[" + cases[j, i].GetChiffre() + "]";
+                    line += "[" + cases[i, j].GetCarac() + "]";
                 }
-                if((i+1)%3 == 0)
-                {
-                    line += "\n";
-                }
+
                 Console.WriteLine(line);
             }
+            Console.WriteLine();
+        }
+
+        public void AfficheEnCouleur()
+        {
+            MAJCases();
+
+            for (int i = 0; i < NB_CASE_PAR_LIGNE; i++)
+            {
+                Console.Write("");
+                if (i % 3 == 0 && i != 0)
+                {
+                    Console.Write("\n");
+                }
+                for (int j = 0; j < NB_CASE_PAR_LIGNE; j++)
+                {
+                    if (j % 3 == 0 && j != 0)
+                    {
+                        Console.Write(" ");
+                    }
+                    Console.Write("[");
+                    if (!cases[i, j].GetDejaDefini())
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    Console.Write(cases[i, j].GetCarac());
+                    Console.ResetColor();
+                    Console.Write("]");
+                }
+
+                Console.WriteLine();
+            }
+            Console.WriteLine();
         }
 
         public void SetCases(Case[,] cases)
         {
             this.cases = cases;
+        }
+
+        public Case[,] GetCases()
+        {
+            MAJCases();
+            return this.cases;
         }
     }
 }
